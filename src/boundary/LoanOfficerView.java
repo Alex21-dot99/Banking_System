@@ -14,6 +14,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import dao.LoanRequestStore;
+import java.util.ArrayList;
+import java.util.List;
+
 import dao.CustomerDAO;
 import entity.Customer;
 
@@ -33,10 +37,11 @@ public class LoanOfficerView {
 
         Label statusLabel = new Label("Select a loan request to review, or enter a new request.");
 
-        ObservableList<String> loanItems = FXCollections.observableArrayList(
-                "LN-001 | Customer: CUST-001 | Amount: BWP 15000.00 | Status: PENDING",
-                "LN-002 | Customer: CUST-002 | Amount: BWP 8500.00 | Status: PENDING"
-        );
+        List<String> initialLines = new ArrayList<>();
+        for (LoanRequest req : LoanRequestStore.getRequests()) {
+            initialLines.add(LoanRequestStore.formatForList(req));
+        }
+        ObservableList<String> loanItems = FXCollections.observableArrayList(initialLines);
         ListView<String> loanListView = new ListView<>(loanItems);
         loanListView.setPrefHeight(200);
 

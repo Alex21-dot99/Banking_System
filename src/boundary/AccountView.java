@@ -18,6 +18,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import dao.LoanRequestStore;
+import entity.LoanRequest;
+import java.util.Date;
+import java.util.Optional;
+import javafx.scene.control.TextInputDialog;
+
 import java.util.List;
 
 public class AccountView {
@@ -58,6 +64,7 @@ public class AccountView {
         Button depositButton = new Button("Deposit");
         Button withdrawButton = new Button("Withdraw");
         Button interestButton = new Button("Process Interest");
+        Button requestLoanButton = new Button("Request Loan");
         Button logoutButton = new Button("Logout");
 
         Label statusLabel = new Label();
@@ -129,6 +136,40 @@ public class AccountView {
             }
         });
 
+        requestLoanButton.setOnAction(e -> {
+            TextInputDialog amountDialog = new TextInputDialog(amountField.getText().trim());
+            amountDialog.setTitle("Request Loan");
+            amountDialog.setHeaderText("Submit a Loan Request");
+            amountDialog.setContentText("Enter loan amount (BWP):");
+
+            Optional<String> amountResult = amountDialog.showAndWait();
+            if (amountResult.isEmpty()) return;
+
+            double loanAmount;
+            try {
+                loanAmount = Double.parseDouble(amountResult.get().trim());
+                if (loanAmount <= 0) {
+                    statusLabel.setText("Loan amount must be greater than 0.");
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                statusLabel.setText("Enter a valid numeric loan amount.");
+                return;
+            }
+
+            TextInputDialog purposeDialog = new TextInputDialog("Personal / Account Loan");
+            purposeDialog.setTitle("Loan Purpose");
+            purposeDialog.setHeaderText("Loan Purpose");
+            purposeDialog.setContentText("Enter purpose:");
+            String purpose = purposeDialog.showAndWait().map(String::trim).filter(s -> !s.isEmpty()).orElse("Loan Request");
+
+            String reqId = LoanRequestStore.nextRequestId();
+            LoanRequest req = new LoanRequest(reqId, customer, loanAmount, purpose, "PENDING", new Date());
+            LoanRequestStore.addRequest(req);
+
+            statusLabel.setText("Loan request " + reqId + " (BWP " + String.format("%.2f", loanAmount) + ") sent to Loan Officer.");
+        });
+
         logoutButton.setOnAction(e -> {
             try {
                 new LoginView().start(stage);
@@ -137,7 +178,7 @@ public class AccountView {
             }
         });
 
-        HBox actions = new HBox(10, depositButton, withdrawButton, interestButton, logoutButton);
+        HBox actions = new HBox(10, depositButton, withdrawButton, interestButton, requestLoanButton, logoutButton);
         VBox root = new VBox(
                 12,
                 welcomeLabel,
@@ -152,6 +193,6 @@ public class AccountView {
         );
         root.setPadding(new Insets(20));
 
-        return new Scene(root, 540, 480);
+        return new Scene(root, 640, 480);
     }
 }
