@@ -168,4 +168,21 @@ public class CustomerDAO{
         }
         return customers;
     }
+    public boolean insertCustomer(String userId, String firstName, String surname,
+                                  String username, String email, String phone,
+                                  String address, String passwordHash) {
+        Customer customer = new IndividualCustomer(
+                userId,
+                firstName,
+                surname,
+                username,
+                passwordHash,
+                address,
+                phone,
+                email,
+                "",
+                ""
+        );
+        return saveCustomer(customer);
+    }
 }
