@@ -63,7 +63,6 @@ public class AccountView {
 
         Button depositButton = new Button("Deposit");
         Button withdrawButton = new Button("Withdraw");
-        Button interestButton = new Button("Process Interest");
         Button requestLoanButton = new Button("Request Loan");
         Button logoutButton = new Button("Logout");
 
@@ -126,16 +125,6 @@ public class AccountView {
             }
         });
 
-        interestButton.setOnAction(e -> {
-            Account selected = accountSelector.getValue();
-            if (selected == null) return;
-            boolean success = accountController.processInterest(selected);
-            statusLabel.setText(success ? "Interest processed." : "Interest not applicable.");
-            if (success) {
-                refreshView.run();
-            }
-        });
-
         requestLoanButton.setOnAction(e -> {
             TextInputDialog amountDialog = new TextInputDialog(amountField.getText().trim());
             amountDialog.setTitle("Request Loan");
@@ -178,7 +167,7 @@ public class AccountView {
             }
         });
 
-        HBox actions = new HBox(10, depositButton, withdrawButton, interestButton, requestLoanButton, logoutButton);
+        HBox actions = new HBox(10, depositButton, withdrawButton, requestLoanButton, logoutButton);
         VBox root = new VBox(
                 12,
                 welcomeLabel,
